@@ -1,0 +1,1 @@
+INDEX VERSION 1.126+C:\Users\Vicente\Desktop\Android\workspace_Meryland\.metadata\.plugins\org.eclipse.jdt.core
