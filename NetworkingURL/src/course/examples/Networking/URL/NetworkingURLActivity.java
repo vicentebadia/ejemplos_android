@@ -33,13 +33,13 @@ public class NetworkingURLActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				new HttpGetTask().execute();
+				new HttpGetTask().execute(); // <-- Hacer click genera un nuevo objeto tipo HttpGetTask sobre el que llamamos a execute
 			}
 		});
 	}
 
-	private class HttpGetTask extends AsyncTask<Void, Void, String> {
-
+	private class HttpGetTask extends AsyncTask<Void, Void, String> { // <-- Extendemos de AsyncTask para hacer el trabajo en background
+																	  // Los 3 params.abstractos se usan en doInBackground, onProgressUpdate y onPostExecute respectivamente
 		private static final String TAG = "HttpGetTask";
 
 		// Get your own user name at http://www.geonames.org/login
@@ -50,16 +50,14 @@ public class NetworkingURLActivity extends Activity {
 		@Override
 		protected String doInBackground(Void... params) {
 			String data = "";
-			HttpURLConnection httpUrlConnection = null;
+			HttpURLConnection httpUrlConnection = null; // <-- Inicializamos a null un objeto tipo HttpURLConnection de la libreria Java.net
 
 			try {
-				httpUrlConnection = (HttpURLConnection) new URL(URL)
-						.openConnection();
+				httpUrlConnection = (HttpURLConnection) new URL(URL).openConnection(); // <-- Llamamos a openConnection sobre un nuevo objeto tipo URL
 
-				InputStream in = new BufferedInputStream(
-						httpUrlConnection.getInputStream());
+				InputStream in = new BufferedInputStream(httpUrlConnection.getInputStream()); // <-- getInputStream sobre el objeto anterior nos devuelve un BufferedInputStream 
 
-				data = readStream(in);
+				data = readStream(in); // <-- Con el método que nos hemos hecho mas abajo, convertimos el BufferedInputStream en un String
 
 			} catch (MalformedURLException exception) {
 				Log.e(TAG, "MalformedURLException");
@@ -67,17 +65,17 @@ public class NetworkingURLActivity extends Activity {
 				Log.e(TAG, "IOException");
 			} finally {
 				if (null != httpUrlConnection)
-					httpUrlConnection.disconnect();
+					httpUrlConnection.disconnect(); // <-- Importante desconectar el URL al acabar
 			}
-			return data;
+			return data; // <-- Devolvemos el String con el resultado que nos ha devuelto la web
 		}
 
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(String result) { // <-- onPostExecute permite actuar sobre el UI Thread sin problemas
 			mTextView.setText(result);
 		}
 
-		private String readStream(InputStream in) {
+		private String readStream(InputStream in) { // <-- Metodo que hemos creado para convertir de InputStream a String
 			BufferedReader reader = null;
 			StringBuffer data = new StringBuffer("");
 			try {

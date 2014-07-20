@@ -32,14 +32,14 @@ public class NetworkingSocketsActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				new HttpGetTask().execute();
+				new HttpGetTask().execute(); // <-- Hacer click genera un nuevo objeto tipo HttpGetTask sobre el que llamamos a execute
 
 			}
 		});
 	}
 
-	private class HttpGetTask extends AsyncTask<Void, Void, String> {
-
+	private class HttpGetTask extends AsyncTask<Void, Void, String> { // <-- Extendemos de AsyncTask, porque queremos realizar esta tarea en background
+																	  // Los 3 params.abstractos se usan en doInBackground, onProgressUpdate y onPostExecute respectivamente
 		private static final String HOST = "api.geonames.org";
 
 		// Get your own user name at http://www.geonames.org/login
@@ -57,16 +57,15 @@ public class NetworkingSocketsActivity extends Activity {
 
 		@Override
 		protected String doInBackground(Void... params) {
-			Socket socket = null;
+			Socket socket = null; // <-- Inicializamos a null un objeto tipo Socket
 			String data = "";
 
 			try {
-				socket = new Socket(HOST, 80);
-				PrintWriter pw = new PrintWriter(new OutputStreamWriter(
-						socket.getOutputStream()), true);
-				pw.println(HTTP_GET_COMMAND);
+				socket = new Socket(HOST, 80); // <-- Definimos donde conecta el socket y por que puerto
+				PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+				pw.println(HTTP_GET_COMMAND); // <-- Con esta linea y la anteriors le pasamos al socket el comando HTTP
 
-				data = readStream(socket.getInputStream());
+				data = readStream(socket.getInputStream()); // <-- Guardo en data el valor que me devuelve la página a la que hemos hecho el request
 
 			} catch (UnknownHostException exception) {
 				exception.printStackTrace();
@@ -75,26 +74,26 @@ public class NetworkingSocketsActivity extends Activity {
 			} finally {
 				if (null != socket)
 					try {
-						socket.close();
+						socket.close(); // <-- Importante cerrar el socket al acabar
 					} catch (IOException e) {
 						Log.e(TAG, "IOException");
 					}
 			}
-			return data;
+			return data; // <-- doInBackground devuelve el string con la respuesta
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
-			mTextView.setText(result);
+			mTextView.setText(result); // <-- Al acabar la tarea asíncrona, actualizamos el TextView correspondiente en pantalla.
 		}
 
-		private String readStream(InputStream in) {
+		private String readStream(InputStream in) { // <-- Método auxiliar para leer el stream que nos devuelve la web
 			BufferedReader reader = null;
 			StringBuffer data = new StringBuffer();
 			try {
-				reader = new BufferedReader(new InputStreamReader(in));
+				reader = new BufferedReader(new InputStreamReader(in)); // <-- Se crea objeto tipo BufferReader a partir del InputStream que se nos pasa
 				String line = "";
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null) { // <-- Mientras haya lineas, vamos concatenandolo al StringBurffer data
 					data.append(line);
 				}
 			} catch (IOException e) {
@@ -102,13 +101,13 @@ public class NetworkingSocketsActivity extends Activity {
 			} finally {
 				if (reader != null) {
 					try {
-						reader.close();
+						reader.close(); // <-- Importante cerrar el BufferReader al acabar
 					} catch (IOException e) {
 						Log.e(TAG, "IOException");
 					}
 				}
 			}
-			return data.toString();
+			return data.toString(); // <-- Convertimos el StringBuffer data en un String
 		}
 	}
 }
