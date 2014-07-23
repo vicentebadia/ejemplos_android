@@ -31,13 +31,12 @@ class XMLResponseHandler implements ResponseHandler<List<String>> {
 			XmlPullParser xpp = factory.newPullParser();
 
 			// Set the Parser's input to be the XML document in the HTTP Response
-			xpp.setInput(new InputStreamReader(response.getEntity()
-					.getContent()));
+			xpp.setInput(new InputStreamReader(response.getEntity().getContent()));
 			
 			// Get the first Parser event and start iterating over the XML document 
 			int eventType = xpp.getEventType();
 
-			while (eventType != XmlPullParser.END_DOCUMENT) {
+			while (eventType != XmlPullParser.END_DOCUMENT) { // <-- Segun el tag que vamos encontrando realizamos una acción un otra
 
 				if (eventType == XmlPullParser.START_TAG) {
 					startTag(xpp.getName());
@@ -48,13 +47,13 @@ class XMLResponseHandler implements ResponseHandler<List<String>> {
 				}
 				eventType = xpp.next();
 			}
-			return mResults;
+			return mResults; // <-- Si todo va bien, devolvemos una lista de String con los datos ya parseados
 		} catch (XmlPullParserException e) {
 		}
-		return null;
+		return null; // <-- Si algo falla, devolvemos null
 	}
 
-	public void startTag(String localName) {
+	public void startTag(String localName) { // <-- Si hemos encontrado un start tag, ponemos a true el flag correspondiente
 		if (localName.equals(LATITUDE_TAG)) {
 			mIsParsingLat = true;
 		} else if (localName.equals(LONGITUDE_TAG)) {
@@ -64,7 +63,7 @@ class XMLResponseHandler implements ResponseHandler<List<String>> {
 		}
 	}
 
-	public void text(String text) {
+	public void text(String text) { // <-- Si hemos encontrado texto, lo guardamos donde corresponde
 		if (mIsParsingLat) {
 			mLat = text.trim();
 		} else if (mIsParsingLng) {
@@ -74,17 +73,17 @@ class XMLResponseHandler implements ResponseHandler<List<String>> {
 		}
 	}
 
-	public void endTag(String localName) {
+	public void endTag(String localName) { // <-- Al ver un end tag, ponemos a false el flag correspondiente
 		if (localName.equals(LATITUDE_TAG)) {
 			mIsParsingLat = false;
 		} else if (localName.equals(LONGITUDE_TAG)) {
 			mIsParsingLng = false;
 		} else if (localName.equals(MAGNITUDE_TAG)) {
 			mIsParsingMag = false;
-		} else if (localName.equals("earthquake")) {
+		} else if (localName.equals("earthquake")) { // <-- Añadimos el dato a la posicion de la lista de Strings
 			mResults.add(MAGNITUDE_TAG + ":" + mMag + "," + LATITUDE_TAG + ":"
 					+ mLat + "," + LONGITUDE_TAG + ":" + mLng);
-			mLat = null;
+			mLat = null;	// <-- Y ponemos a null los datos a null para poder rellenarlos en la siguiente iteración (si fuera necesario)
 			mLng = null;
 			mMag = null;
 		}
